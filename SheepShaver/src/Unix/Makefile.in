@@ -35,7 +35,7 @@ BLESS = @BLESS@
 EXEEXT = @EXEEXT@
 KEYCODES = @KEYCODES@
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@ -s
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 
 SLIRP_CFLAGS = @SLIRP_CFLAGS@
@@ -46,7 +46,8 @@ STANDALONE_GUI = @STANDALONE_GUI@
 GUI_CFLAGS = @GUI_CFLAGS@
 GUI_LIBS = @GUI_LIBS@
 GUI_SRCS = ../prefs.cpp prefs_unix.cpp prefs_editor_gtk.cpp ../prefs_items.cpp \
-	../user_strings.cpp user_strings_unix.cpp xpram_unix.cpp sys_unix.cpp rpc_unix.cpp
+	../user_strings.cpp user_strings_unix.cpp xpram_unix.cpp sys_unix.cpp rpc_unix.cpp \
+	../dummy/prefs_dummy.cpp
 
 # Append disassembler to dyngen, if available
 ifneq (:no,$(MONSRCS):$(USE_DYNGEN))
@@ -59,7 +60,7 @@ SRCS = ../main.cpp main_unix.cpp ../prefs.cpp ../prefs_items.cpp prefs_unix.cpp 
     ../macos_util.cpp ../timer.cpp timer_unix.cpp ../xpram.cpp xpram_unix.cpp \
     ../adb.cpp ../sony.cpp ../disk.cpp ../cdrom.cpp ../scsi.cpp \
     ../gfxaccel.cpp ../video.cpp video_blit.cpp ../audio.cpp ../ether.cpp ../thunks.cpp \
-    ../serial.cpp ../extfs.cpp \
+    ../serial.cpp ../extfs.cpp disk_sparsebundle.cpp tinyxml2.cpp \
     about_window_unix.cpp ../user_strings.cpp user_strings_unix.cpp \
     vm_alloc.cpp sigsegv.cpp rpc_unix.cpp \
     sshpty.c strlcpy.c $(SYSSRCS) $(CPUSRCS) $(MONSRCS) $(SLIRP_SRCS)

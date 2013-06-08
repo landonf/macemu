@@ -21,6 +21,9 @@ AC_ARG_ENABLE(standalone-gui,[  --enable-standalone-gui enable a standalone GUI 
 dnl Mac OS X GUI.
 AC_ARG_ENABLE(macosx-gui,    [  --enable-macosx-gui     enable Mac OS X GUI [default=no]], [WANT_MACOSX_GUI=$enableval], [WANT_MACOSX_GUI=no])
 
+dnl Mac OS X Sound
+AC_ARG_ENABLE(macosx-sound,  [  --enable-macosx-sound   enable Mac OS X Sound [default=no]], [WANT_MACOSX_SOUND=$enableval], [WANT_MACOSX_SOUND=no])
+
 dnl Video options.
 AC_ARG_ENABLE(xf86-dga,      [  --enable-xf86-dga       use the XFree86 DGA extension [default=yes]], [WANT_XF86_DGA=$enableval], [WANT_XF86_DGA=yes])
 AC_ARG_ENABLE(xf86-vidmode,  [  --enable-xf86-vidmode   use the XFree86 VidMode extension [default=yes]], [WANT_XF86_VIDMODE=$enableval], [WANT_XF86_VIDMODE=yes])
@@ -112,7 +115,7 @@ case "$target_cpu" in
   m68k* ) HAVE_M68K=yes;;
   sparc* ) HAVE_SPARC=yes;;
   powerpc* ) HAVE_POWERPC=yes;;
-  x86_64* ) HAVE_X86_64=yes;;
+  x86_64* | amd64* ) HAVE_X86_64=yes;;
 esac
 
 dnl Check if we should really be assuming x86_64 even if we detected HAVE_I386 above.
@@ -250,7 +253,7 @@ else
 fi
 
 dnl We need X11, if not using SDL.
-if [[ "x$WANT_SDL" = "xno" ]]; then
+if [[ "x$WANT_SDL_VIDEO" = "xno" ]]; then
   AC_PATH_XTRA
   if [[ "x$no_x" = "xyes" ]]; then
     AC_MSG_ERROR([You need X11 to run Basilisk II.])
@@ -509,6 +512,10 @@ mips-sony-bsd|mips-sony-newsos4)
 	;;
 *-*-darwin*)
 	no_dev_ptmx=1
+	LIBS="$LIBS -lstdc++"
+	;;
+*-*-freebsd*)
+	no_dev_ptmx=1
 	;;
 esac
 
@@ -719,9 +726,13 @@ if [[ "x$WANT_MACOSX_GUI" = "xyes" ]]; then
   EXTRASYSSRCS="$EXTRASYSSRCS ../MacOSX/prefs_macosx.cpp"
 
   VIDEOSRCS="../MacOSX/video_macosx.mm"
-  AUDIOSRC="../MacOSX/audio_macosx.cpp ../MacOSX/AudioBackEnd.cpp ../MacOSX/AudioDevice.cpp ../MacOSX/MacOSX_sound_if.cpp"
 else
   EXTRASYSSRCS="$EXTRASYSSRCS main_unix.cpp prefs_unix.cpp"
+fi
+
+if [[ "x$WANT_MACOSX_SOUND" = "xyes" ]]; then
+  AUDIOSRC="../MacOSX/audio_macosx.cpp ../MacOSX/AudioBackEnd.cpp ../MacOSX/AudioDevice.cpp ../MacOSX/MacOSX_sound_if.cpp"
+  LIBS="$LIBS -framework AudioToolbox -framework AudioUnit -framework CoreAudio"
 fi
 
 dnl SDL overrides
@@ -1725,12 +1736,6 @@ if [[ "x$WANT_NATIVE_M68K" = "xno" ]]; then
   CPUSRCS="../uae_cpu/basilisk_glue.cpp ../uae_cpu/memory.cpp ../uae_cpu/newcpu.cpp ../uae_cpu/readcpu.cpp $FPUSRCS cpustbl.cpp cpudefs.cpp $CPUSRCS $JITSRCS"
 fi
 
-dnl Remove the "-g" option if set for GCC.
-if [[ "x$HAVE_GCC27" = "xyes" ]]; then
-  CFLAGS=`echo $CFLAGS | sed -e 's/-g\b//g'`
-  CXXFLAGS=`echo $CXXFLAGS | sed -e 's/-g\b//g'`
-fi
-
 dnl Or if we have -IPA (MIPSPro compilers)
 if [[ "x$HAVE_IPA" = "xyes" ]]; then
   CFLAGS="`echo $CFLAGS | sed -e 's/-g//g'` -O3 -OPT:Olimit=0 -IPA"
@@ -1754,6 +1759,7 @@ echo
 echo Basilisk II configuration summary:
 echo
 echo Mac OS X GUI ........................... : $WANT_MACOSX_GUI
+echo Mac OS X Sound ......................... : $WANT_MACOSX_SOUND
 echo SDL support ............................ : $SDL_SUPPORT
 echo BINCUE support ......................... : $have_bincue
 echo LIBVHD support ......................... : $have_libvhd

@@ -484,6 +484,9 @@ mips-sony-bsd|mips-sony-newsos4)
 *-*-darwin*)
 	no_dev_ptmx=1
 	;;
+*-*-freebsd*)
+	no_dev_ptmx=1
+	;;
 esac
 
 if test -z "$no_dev_ptmx" ; then
@@ -652,7 +655,7 @@ esac
 dnl BINCUE
 AS_IF([test  "x$with_bincue" = "xyes" ], [have_bincue=yes], [have_bincue=no])
 AS_IF([test  "x$have_bincue" = "xyes" ], [
-   if [[ "xOSX_CORE_AUDIO" = "xno"  -a "x$WANT_SDL_AUDIO"="xno"]]; then
+   if [[ "xOSX_CORE_AUDIO" = "xno"  -a "x$WANT_SDL_AUDIO"="xno" ]]; then
        AC_MSG_ERROR([You need SDL or OSX Core Audio to use BINCUE support.])
    else
        CPPFLAGS="$CPPFLAGS -DBINCUE $OSX_CORE_AUDIO"
